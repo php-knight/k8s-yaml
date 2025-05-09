@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-nats
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.nats.type }}
+  selector:
+    app: nats
+    {{- include "chart.selectorLabels" . | nindent 4 }}
+  ports:
+  {{- .Values.nats.ports | toYaml | nindent 2 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-nats
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.nats.replicas }}
+  selector:
+    matchLabels:
+      app: nats
+    {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: nats
+      {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args: {{- toYaml .Values.nats.nats.args | nindent 8 }}
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.nats.nats.image.repository }}:{{ .Values.nats.nats.image.tag
+          | default .Chart.AppVersion }}
+        name: nats
+        ports:
+        - containerPort: 4222
+        - containerPort: 6222
+        - containerPort: 8222
+        resources: {}

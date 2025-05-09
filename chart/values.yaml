@@ -1,0 +1,86 @@
+kubernetesClusterDomain: cluster.local
+mongodb:
+  mongodb:
+    env:
+      mongoInitdbDatabase: k8s_mongodb
+      mongoInitdbRootPassword: root123
+      mongoInitdbRootUsername: root
+    image:
+      repository: mongo
+      tag: "6.0"
+  ports:
+  - name: tcp-27017
+    nodePort: 32717
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  strategy:
+    type: Recreate
+  type: NodePort
+mysql:
+  mysql:
+    env:
+      mysqlDatabase: k8s_mysql
+      mysqlPassword: "123456"
+      mysqlRootPassword: "123456"
+      mysqlUser: k8s_user
+    image:
+      repository: mysql
+      tag: "9.1"
+  ports:
+  - name: tcp-3306
+    nodePort: 30306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  strategy:
+    type: Recreate
+  type: NodePort
+nats:
+  nats:
+    args:
+    - -m
+    - "8222"
+    image:
+      repository: nats
+      tag: 2.10.11
+  ports:
+  - name: client
+    nodePort: 30022
+    port: 4222
+    targetPort: 4222
+  - name: cluster
+    port: 6222
+    targetPort: 6222
+  - name: monitoring
+    nodePort: 30082
+    port: 8222
+    targetPort: 8222
+  replicas: 1
+  type: NodePort
+pvc:
+  mongodbPvClaim:
+    storageClass: local-storage
+    storageRequest: 10Gi
+  mysqlPvClaim:
+    storageClass: local-storage
+    storageRequest: 10Gi
+  pvc:
+    storageClass: local-storage
+    storageRequest: 10Gi
+redis:
+  ports:
+  - name: tcp-6379
+    nodePort: 32637
+    port: 6379
+    protocol: TCP
+    targetPort: 6379
+  redis:
+    env:
+      redisPassword: "123456"
+    image:
+      repository: redis
+      tag: 6.2.6
+  strategy:
+    type: Recreate
+  type: NodePort
