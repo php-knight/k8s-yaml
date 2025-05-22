@@ -4,12 +4,6 @@ metadata:
   name: deploy-env
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: grafana
-  namespace: deploy-env
----
-apiVersion: v1
 kind: Service
 metadata:
   name: grafana
@@ -23,6 +17,32 @@ spec:
   selector:
     app: grafana
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-pv
+  namespace: deploy-env
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /run/desktop/mnt/host/d/k8s/data/grafana
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: deploy-env
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -31,16 +51,16 @@ metadata:
   labels:
     app: grafana
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: grafana
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: grafana
     spec:
-      serviceAccountName: grafana
       containers:
         - name: grafana
           image: grafana/grafana:10.0.3
@@ -51,10 +71,13 @@ spec:
               value: admin
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: admin
+            - name: GF_DEFAULT_INSTANCE_LOCALE
+              value: zh-Hans  # 设置默认语言为中文
           volumeMounts:
-            - name: grafana-storage
+            - name: grafana-data
               mountPath: /var/lib/grafana
       volumes:
-        - name: grafana-storage
-          emptyDir: {}
+        - name: grafana-data
+          persistentVolumeClaim:
+            claimName: grafana-pvc
 
