@@ -1,18 +1,19 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: deploy-env
+  name: monitoring
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: grafana
-  namespace: deploy-env
+  namespace: monitoring
 spec:
   type: NodePort  # 可改为 ClusterIP 或 LoadBalancer
   ports:
     - port: 3000
       targetPort: 3000
+      protocol: TCP
       nodePort: 32000  # 可以访问 http://<NodeIP>:32000
   selector:
     app: grafana
@@ -21,33 +22,78 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: grafana-pv
-  namespace: deploy-env
+  namespace: monitoring
+  labels:
+    app: grafana
+    type: local
 spec:
   capacity:
-    storage: 5Gi
+    storage: 10Gi  #设置 pv 存储资源大小 
   accessModes:
     - ReadWriteOnce
-  hostPath:
-    path: /run/desktop/mnt/host/d/k8s/data/grafana
-  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  volumeMode: Filesystem
+  local:
+    path: /run/desktop/mnt/host/d/k8s/data/grafana #windows:  /run/desktop/mnt/host/ + 实际路径
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - docker-desktop
 ---
+#持久声明
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: grafana-pvc
-  namespace: deploy-env
+  namespace: monitoring
 spec:
+  selector:
+    matchLabels:
+      app: grafana
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 10Gi
+  storageClassName: hostpath
+---
+# Grafana 配置文件 ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: monitoring
+data:
+  grafana.ini: |
+    [server]
+    http_port = 3000  # Grafana 监听端口
+    root_url = %(protocol)s://%(domain)s:%(http_port)s/
+
+    [database]
+    type = sqlite3  # 默认使用 SQLite 数据库
+    path = /var/lib/grafana/grafana.db  # 数据库存放路径
+
+    [security]
+    admin_user = admin  # 管理员用户名
+    admin_password = admin  # 管理员密码
+
+    [users]
+    default_theme = light  # 默认 UI 主题(light / dark)
+
+    [auth.anonymous]
+    enabled = true  # 允许匿名访问(默认 Viewer 权限)
+    org_name = Main Org.
+    org_role = Viewer
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: deploy-env
+  namespace: monitoring
   labels:
     app: grafana
 spec:
@@ -61,9 +107,34 @@ spec:
       labels:
         app: grafana
     spec:
+      securityContext:
+        runAsUser: 0  # <== 添加这一段，使用 root 用户
       containers:
         - name: grafana
           image: grafana/grafana:10.0.3
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /robots.txt
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 250m
+              memory: 750Mi
           ports:
             - containerPort: 3000
           env:
@@ -74,10 +145,16 @@ spec:
             - name: GF_DEFAULT_INSTANCE_LOCALE
               value: zh-Hans  # 设置默认语言为中文
           volumeMounts:
-            - name: grafana-data
-              mountPath: /var/lib/grafana
+          - name: grafana-config
+            mountPath: /etc/grafana/grafana.ini  # 挂载配置文件
+            subPath: grafana.ini  # 只映射 configMap 中的 grafana.ini 文件
+          - name: grafana-storage
+            mountPath: /var/lib/grafana
       volumes:
-        - name: grafana-data
+        - name: grafana-storage
           persistentVolumeClaim:
             claimName: grafana-pvc
+        - name: grafana-config
+          configMap:
+            name: grafana-config  # 关联 ConfigMap，提供 Grafana 配置文件
 
