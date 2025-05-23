@@ -6,10 +6,8 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus
+  name: prometheus-service
   namespace: monitoring
-  annotations:
-    prometheus.io/should_be_scraped: "true"
 spec:
   selector:
     app: prometheus
@@ -107,42 +105,30 @@ metadata:
   name: prometheus-pv
   namespace: monitoring
   labels:
-    app: prometheus
     type: local
 spec:
   capacity:
-    storage: 10Gi  #设置 pv 存储资源大小 
+    storage: 5Gi
   accessModes:
     - ReadWriteOnce
-  storageClassName: hostpath
-  volumeMode: Filesystem
-  local:
-    path: /run/desktop/mnt/host/d/k8s/data/prometheus #windows:  /run/desktop/mnt/host/ + 实际路径
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - docker-desktop
+  storageClassName: local-storage
+  hostPath:
+    path: /run/desktop/mnt/host/d/k8s/data/prometheus
+    type: DirectoryOrCreate # 如果路径不存在，则创建该目录
 ---
-#持久声明
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: prometheus-pvc
   namespace: monitoring
 spec:
-  selector:
-    matchLabels:
-      app: prometheus
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
-  storageClassName: hostpath
+      storage: 5Gi
+  volumeName: prometheus-pv # 确保PVC与PV关联
+  storageClassName: local-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -162,15 +148,13 @@ spec:
         app: prometheus
     spec:
       securityContext:
-        runAsUser: 0  # <== 添加这一段，使用 root 用户
+          runAsUser: 0  # <== 添加这一段，使用 root 用户
       containers:
       - name: prometheus
         image: prom/prometheus:v2.52.0
-        imagePullPolicy: IfNotPresent 
         args:
-          - prometheus
-          - --config.file=/etc/prometheus/prometheus.yml  # 指定配置文件
-          - --storage.tsdb.path=/prometheus               # 数据存放目录
+          - "--config.file=/etc/prometheus/prometheus.yml"
+          - "--storage.tsdb.path=/prometheus"
         ports:
           - containerPort: 9090
         volumeMounts:
