@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: geminiprochat-service
+spec:
+  selector:
+    app: geminiprochat  # 与 Deployment 的 label 匹配
+  ports:
+    - protocol: TCP
+      port: 3000        # Service 暴露的端口
+      targetPort: 3000    # 转发到 Pod 的端口
+  type: NodePort    # 可以选择不同的类型
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geminiprochat-deployment
+  labels:
+    app: geminiprochat
+spec:
+  replicas: 1  # 运行一个 Pod 实例，可以根据需要调整
+  selector:
+    matchLabels:
+      app: geminiprochat
+  template:
+    metadata:
+      labels:
+        app: geminiprochat
+    spec:
+      containers:
+      - name: geminiprochat
+        image: babaohuang/geminiprochat:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GEMINI_API_KEY
+          value: "AIzaSyC9KEYkRzxddK5eAQgRokJbMjGN89lYClg"  # 替换为您的 GEMINI API 密钥
+        # 如果您希望使用 Secret 来管理密钥，可以按照下面的方式修改
+        # env:
+        # - name: GEMINI_API_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: gemini-api-key-secret
+        #       key: api-key
+      restartPolicy: Always
