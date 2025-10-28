@@ -32,18 +32,10 @@ data:
     scrape_configs:
     - job_name: 'kubernetes-node'
       static_configs:
-          - targets: [
-            "192.168.6.215:6101",
-            "192.168.6.215:6201",
-            "192.168.6.216:6009",
-            "192.168.6.217:6009",
-            "192.168.6.35:6009",
-            "192.168.6.35:6004",
-            "192.168.6.106:6009",
-            "192.168.6.106:6004",
-            "192.168.6.106:6010",
-            ] # 自定义监控的端口，此处为自定义的监控服务端口
-      - role: node                    # 使用node模式服务发现
+      - targets: [
+          "192.168.6.35:6009",
+          "192.168.6.35:6004",
+        ] # 自定义监控的端口，此处为自定义的监控服务端口
       relabel_configs:                # 正则匹配
       - source_labels: [__address__]  # 匹配带有IP的标签
         regex: '(.*):10250'           # 10250端口(kubelet端口)
@@ -57,7 +49,7 @@ data:
         - targets: ['nats-exporter.monitoring.svc.cluster.local:7777']
     - job_name: 'kubernetes-node-cadvisor' # cadvisor容器用于收集和提供有关节点上运行的容器的资源使用情况和性能指标
       kubernetes_sd_configs:
-      - role:  node
+      - role:  node # 使用node模式服务发现
       scheme: https
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
