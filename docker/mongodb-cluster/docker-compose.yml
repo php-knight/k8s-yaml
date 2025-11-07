@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # 配置服务器副本集(3节点)
+  mongo-configsvr1:
+    image: mongo:7.0.1
+    container_name: mongo-configsvr1
+    command: mongod --configsvr --port 27019 --replSet cfgset --bind_ip_all
+    ports:
+      - "60001:27019"
+    volumes:
+      - ./configdb1:/data/configdb
+    restart: always
+
+  mongo-configsvr2:
+    image: mongo:7.0.1
+    container_name: mongo-configsvr2
+    command: mongod --configsvr --port 27019 --replSet cfgset --bind_ip_all
+    ports:
+      - "60002:27019"
+    volumes:
+      - ./configdb2:/data/configdb
+    restart: always
+
+  mongo-configsvr3:
+    image: mongo:7.0.1
+    container_name: mongo-configsvr3
+    command: mongod --configsvr --port 27019 --replSet cfgset --bind_ip_all
+    ports:
+      - "60003:27019"
+    volumes:
+      - ./configdb3:/data/configdb
+    restart: always
+
+  # 分片服务器(3个分片，每个分片为单节点)
+  mongo-shard1:
+    image: mongo:7.0.1
+    container_name: mongo-shard1
+    command: mongod --shardsvr --replSet shard1 --port 27018 --bind_ip_all
+    ports:
+      - "60011:27018"
+    volumes:
+      - ./shard1:/data/db
+    restart: always
+
+  mongo-shard2:
+    image: mongo:7.0.1
+    container_name: mongo-shard2
+    command: mongod --shardsvr --replSet shard2 --port 27018 --bind_ip_all
+    ports:
+      - "60012:27018"
+    volumes:
+      - ./shard2:/data/db
+    restart: always
+
+  mongo-shard3:
+    image: mongo:7.0.1
+    container_name: mongo-shard3
+    command: mongod --shardsvr --replSet shard3 --port 27018 --bind_ip_all
+    ports:
+      - "60013:27018"
+    volumes:
+      - ./shard3:/data/db
+    restart: always
+
+  # 查询路由器(mongos)
+  mongo-mongos1:
+    image: mongo:7.0.1
+    container_name: mongo-mongos1
+    command: mongos --configdb cfgset/mongo-configsvr1:27019,mongo-configsvr2:27019,mongo-configsvr3:27019 --port 27017 --bind_ip_all
+    ports:
+      - "60021:27017"
+    depends_on:
+      - mongo-configsvr1
+      - mongo-configsvr2
+      - mongo-configsvr3
+    restart: always
+
+  mongo-mongos2:
+    image: mongo:7.0.1
+    container_name: mongo-mongos2
+    command: mongos --configdb cfgset/mongo-configsvr1:27019,mongo-configsvr2:27019,mongo-configsvr3:27019 --port 27017 --bind_ip_all
+    ports:
+      - "60022:27017"
+    depends_on:
+      - mongo-configsvr1
+      - mongo-configsvr2
+      - mongo-configsvr3
+    restart: always

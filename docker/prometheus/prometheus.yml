@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 1m
+
+scrape_configs:
+- job_name: 'kubernetes-node'
+  static_configs:
+    - targets:
+      - "192.168.6.215:6001" # account
+      - "192.168.6.215:6101" # avatar1
+      - "192.168.6.215:6102" # avatar2
+      - "192.168.6.215:6201" # world1
+      - "192.168.6.215:6202" # world2
+      - "192.168.6.215:6203" # world3
+      - "192.168.6.216:6009" # 发压机1
+      - "192.168.6.217:6009" # 发压机2
+      #- "192.168.6.106:6009"：
+      - "192.168.6.106:6004"
+      #- "192.168.6.106:6010"
+
+- job_name: 'nats_exporter'
+  static_configs:
+    - targets: ['192.168.6.215:7777']

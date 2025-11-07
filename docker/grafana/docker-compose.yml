@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana:10.0.3
+    container_name: grafana
+    user: "0"   # 等价于 K8S spec.securityContext.runAsUser: 0
+    ports:
+      - "32000:3000"   # 对应 NodePort 32000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_DEFAULT_INSTANCE_LOCALE=zh-Hans
+    volumes:
+      # ConfigMap -> grafana.ini
+      - ./grafana.ini:/etc/grafana/grafana.ini:ro
+      # PV/PVC -> Grafana 数据目录
+      - ./data/grafana:/var/lib/grafana
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/robots.txt"]
+    #   interval: 30s
+    #   timeout: 2s
+    #   retries: 3
+    #   start_period: 10s
+
+volumes:
+  grafana-data:
+    driver: local
