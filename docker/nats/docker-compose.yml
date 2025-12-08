@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+  nats:
+    image: nats:latest
+    container_name: eys_nats
+    restart: always
+    ports:
+      - 4222:4222
+ # 客户端连接
+      - 8222:8222
+ # 监控 API
+    volumes:
+      - ./data:/data
+    command: [
+      "-js",
+      "-sd",
+      "/data/jetstream",
+      "--http_port",
+      "8222",
+    ]
+      
+    # -m 开启监控端口 8222
+    privileged: true
+  nats-exporter:
+    image: natsio/prometheus-nats-exporter:0.15.0
+    container_name: eys_nats-exporter
+    command: [
+      "--varz",
+      "--connz",
+      "--routez",
+      "--serverz",
+      "--subz",
+      "http://nats:8222"
+    ]
+    ports:
+      - "7777:7777"   # exporter 对外暴露指标的端口
+    depends_on:
+      - nats

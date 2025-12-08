@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: deploy-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis6
+  namespace: deploy-env
+spec:
+  ports:
+  - name: tcp-6379
+    targetPort: 6379
+    protocol: TCP
+    port: 6379
+    nodePort: 32637 #暴露端口
+  selector:
+    app: redis
+  type: NodePort
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis6-pv
+  namespace: deploy-env
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 10Gi  #设置 pv 存储资源大小 
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    path: /run/desktop/mnt/host/d/k8s/data/redis8 #windows:  /run/desktop/mnt/host/ + 实际路径
+    type: DirectoryOrCreate # 如果路径不存在，则创建该目录
+---
+#持久声明
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis6-pvc
+  namespace: deploy-env
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: redis6-pv # 确保PVC与PV关联
+  storageClassName: local-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis6
+  namespace: deploy-env
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - image: redis:6.2.6
+        name: redis6
+        command: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
+        env:
+          - name: REDIS_PASSWORD
+            value: "123456"
+        ports:
+        - containerPort: 6379
+          name: redis6
+        volumeMounts:
+        - name: redis6-storage
+          mountPath: /data
+      volumes:
+      - name: redis6-storage
+        persistentVolumeClaim:
+          claimName: redis6-pvc

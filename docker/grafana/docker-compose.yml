@@ -1,13 +1,38 @@
 version: "3.9"
 
 services:
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+    networks:
+      - grafana_wk
+
+  # promtail: 通过其他服务推送
+  #   container_name: promtail
+  #   image: grafana/promtail:latest
+  #   command: -config.file=/etc/promtail/config.yml
+  #   volumes:
+  #     - ./promtail-config.yml:/etc/promtail/config.yml
+  #     - /data/EYS/9001:/var/log # 挂载日志目录
+  #   networks:
+  #     - grafana_wk
+      
   grafana:
-    image: grafana/grafana:10.0.3
+    image: grafana/grafana:latest
     container_name: grafana
     user: "0"   # 等价于 K8S spec.securityContext.runAsUser: 0
     ports:
       - "32000:3000"   # 对应 NodePort 32000
     environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      # - GF_AUTH_ANONYMOUS_ENABLED=true #开启 匿名访问模式
+      # - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin #当启用匿名访问时，访问者的权限被设为：
+      - GF_FEATURE_TOGGLES_ENABLE=alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode #开启 Grafana 新功能开关（Feature Toggles） 的环境变量。
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_DEFAULT_INSTANCE_LOCALE=zh-Hans
@@ -23,7 +48,27 @@ services:
     #   timeout: 2s
     #   retries: 3
     #   start_period: 10s
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy 
+          orgId: 1
+          url: http://grafana_wk:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    networks:
+      - grafana_wk
 
-volumes:
-  grafana-data:
-    driver: local
+networks:
+  grafana_wk:

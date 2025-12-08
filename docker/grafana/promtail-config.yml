@@ -1,0 +1,52 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://192.168.6.9:3100/loki/api/v1/push
+    batchsize: 512          # 每批最大行数，可根据日志量调整
+    batchwait: 2s           # 每批最大等待时间
+    backoff_config:
+      max_period: 5s        # 重试最大间隔
+      min_period: 500ms
+
+scrape_configs:
+  - job_name: "eys"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: eys
+          __path__: /var/log/*/logs/*.log
+
+    pipeline_stages:
+      # 合并多行日志（以日期开头的新行视为新日志）
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}'
+      - match:
+          selector: '{job="eys"}'
+          stages:
+            - regex:
+                source: filename
+                expression: "/var/log/(?P<instance_name>[^/]+)/logs/.*.log*"
+            - labels:
+                instance_name:
+            # 提取日志等级 [error/warn/info]
+            - regex:
+                expression: "\\[ ?(?P<level>[a-zA-Z]+) ?\\]"
+            - labels:
+                level:
+
+            # # 提取 key=value 标签
+            # - regex:
+            #     expression: "Uid=(?P<Uid>\\d+) ConnId=(?P<ConnId>\\d+) ErrCode=(?P<ErrCode>\\d+) ErrString=(?P<ErrString>[^ ]+) ErrCaller=(?P<ErrCaller>\\[[^\\]]+\\]) caller=(?P<caller>[^ ]+)"
+            # - labels:
+            #     Uid:
+            #     ConnId:
+            #     ErrCode:
+            #     ErrString:
+            #     ErrCaller:
+            #     caller:
