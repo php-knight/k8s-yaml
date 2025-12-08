@@ -25,7 +25,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 170,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -44,7 +44,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "description": "",
       "fieldConfig": {
@@ -105,20 +105,16 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "$DS_PROMETHEUS"
+            "uid": "cf6gnu8oy6nswf"
           },
           "editorMode": "code",
-          "exemplar": false,
           "expr": "gnatsd_healthz_status{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}",
-          "format": "time_series",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{ server_id }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -141,7 +137,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -172,6 +168,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -216,7 +213,7 @@
                 "id": "custom.hideFrom",
                 "value": {
                   "legend": false,
-                  "tooltip": false,
+                  "tooltip": true,
                   "viz": true
                 }
               }
@@ -248,21 +245,17 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
           "editorMode": "code",
           "expr": "gnatsd_varz_cpu{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}",
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_cpu",
           "range": true,
-          "refId": "A",
-          "step": 4
+          "refId": "A"
         }
       ],
       "title": "Server CPU",
@@ -271,7 +264,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -302,6 +295,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -353,21 +347,17 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
           "editorMode": "code",
           "expr": "gnatsd_varz_mem{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}",
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_mem",
           "range": true,
-          "refId": "A",
-          "step": 4
+          "refId": "A"
         }
       ],
       "title": "Server Memory",
@@ -389,7 +379,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -420,6 +410,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -472,21 +463,16 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
-          "editorMode": "code",
-          "expr": "irate(gnatsd_varz_in_bytes{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}[$__rate_interval])*8",
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_in_bytes",
+          "expr": "{zone_id=\"${zone_id}\", project_name=\"${project_name}\", server_type=\"${server_type}\"}",
           "range": true,
-          "refId": "A",
-          "step": 10
+          "refId": "A"
         }
       ],
       "title": "Bytes In",
@@ -495,7 +481,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -526,6 +512,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -578,21 +565,16 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
-          "editorMode": "code",
-          "expr": "irate(gnatsd_varz_in_msgs{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}[$__rate_interval])",
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_in_msgs",
+          "expr": "{zone_id=\"${zone_id}\", project_name=\"${project_name}\", server_type=\"${server_type}\"}",
           "range": true,
-          "refId": "A",
-          "step": 10
+          "refId": "A"
         }
       ],
       "title": "NATS Msgs In",
@@ -601,7 +583,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -632,6 +614,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -684,21 +667,16 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
-          "editorMode": "code",
-          "expr": "irate(gnatsd_varz_out_bytes{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}[$__rate_interval])*8",
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_out_bytes",
+          "expr": "{zone_id=\"${zone_id}\", project_name=\"${project_name}\", server_type=\"${server_type}\"}",
           "range": true,
-          "refId": "A",
-          "step": 10
+          "refId": "A"
         }
       ],
       "title": "Bytes Out",
@@ -707,7 +685,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -738,6 +716,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -790,21 +769,16 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
-          "editorMode": "code",
-          "expr": "irate(gnatsd_varz_out_msgs{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}[$__rate_interval])",
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_out_msgs",
+          "expr": "{zone_id=\"${zone_id}\", project_name=\"${project_name}\", server_type=\"${server_type}\"}",
           "range": true,
-          "refId": "A",
-          "step": 10
+          "refId": "A"
         }
       ],
       "title": "NATS Msgs Out",
@@ -826,7 +800,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -857,6 +831,7 @@
               "type": "linear"
             },
             "showPoints": "always",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -909,21 +884,16 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
-          "editorMode": "code",
-          "expr": "gnatsd_varz_connections{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}",
-          "intervalFactor": 1,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_connections",
+          "expr": "{zone_id=\"${zone_id}\", project_name=\"${project_name}\", server_type=\"${server_type}\"}",
           "range": true,
-          "refId": "A",
-          "step": 2
+          "refId": "A"
         }
       ],
       "title": "Connections",
@@ -932,7 +902,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -963,6 +933,7 @@
               "type": "linear"
             },
             "showPoints": "always",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1015,22 +986,17 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
           "editorMode": "code",
           "expr": "gnatsd_varz_subscriptions{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}",
-          "hide": false,
-          "intervalFactor": 2,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_subscriptions",
           "range": true,
-          "refId": "A",
-          "step": 4
+          "refId": "A"
         }
       ],
       "title": "Subscriptions",
@@ -1039,7 +1005,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bejqlypqoyi2oc"
+        "uid": "cf6gnu8oy6nswf"
       },
       "fieldConfig": {
         "defaults": {
@@ -1070,6 +1036,7 @@
               "type": "linear"
             },
             "showPoints": "always",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1122,21 +1089,17 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "cf6gnu8oy6nswf"
           },
           "editorMode": "code",
           "expr": "increase(gnatsd_varz_slow_consumers{zone_id=\"${zone_id}\",project_name=\"${project_name}\",server_type=\"${server_type}\"}[$__rate_interval])",
-          "intervalFactor": 1,
-          "legendFormat": "{{server_id}}",
-          "metric": "gnatsd_varz_slow_consumers",
           "range": true,
-          "refId": "A",
-          "step": 2
+          "refId": "A"
         }
       ],
       "title": "Slow Consumers",
@@ -1145,14 +1108,14 @@
   ],
   "preload": false,
   "refresh": "",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
           "text": "prometheus",
-          "value": "bejqlypqoyi2oc"
+          "value": "cf6gnu8oy6nswf"
         },
         "hide": 2,
         "includeAll": false,
@@ -1190,8 +1153,8 @@
       },
       {
         "current": {
-          "text": "5",
-          "value": "5"
+          "text": "215",
+          "value": "215"
         },
         "datasource": {
           "type": "prometheus",
@@ -1213,12 +1176,12 @@
       },
       {
         "current": {
-          "text": "nats",
-          "value": "nats"
+          "text": "nats_exporter",
+          "value": "nats_exporter"
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "bejqlypqoyi2oc"
+          "uid": "cf6gnu8oy6nswf"
         },
         "definition": "label_values(gnatsd_varz_cpu{project_name=\"$project_name\",zone_id=\"$zone_id\"},server_type)",
         "includeAll": false,
@@ -1244,5 +1207,5 @@
   "timezone": "browser",
   "title": "NATS Servers",
   "uid": "beoedzen82scyo",
-  "version": 8
+  "version": 13
 }

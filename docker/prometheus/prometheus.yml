@@ -4,21 +4,73 @@ global:
   evaluation_interval: 1m
 
 scrape_configs:
-- job_name: 'kubernetes-node'
+
+
+- job_name: 'account-node'
   static_configs:
     - targets:
       - "192.168.6.215:6001" # account
+      labels:
+        zone_id: "215"
+        instance_name: "account"
+        server_type: account
+  metric_relabel_configs:
+  - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
+    target_label: project_name
+    replacement: "ggd"
+
+- job_name: 'avatar-node'
+  static_configs:
+    - targets:
       - "192.168.6.215:6101" # avatar1
       - "192.168.6.215:6102" # avatar2
+      labels:
+        zone_id: "215"
+        instance_name: "avatar"
+        server_type: "avatar"
+  metric_relabel_configs:
+  - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
+    target_label: project_name
+    replacement: "ggd"
+
+- job_name: 'world-node'
+  static_configs:
+    - targets:
       - "192.168.6.215:6201" # world1
       - "192.168.6.215:6202" # world2
       - "192.168.6.215:6203" # world3
+      labels:
+        zone_id: "215"
+        instance_name: "world"
+        server_type: "world"
+  metric_relabel_configs:
+  - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
+    target_label: project_name
+    replacement: "ggd"
+
+- job_name: 'performance-test'
+  metrics_path: /metrics
+  static_configs:
+    - targets:
       - "192.168.6.216:6009" # 发压机1
       - "192.168.6.217:6009" # 发压机2
-      #- "192.168.6.106:6009"：
-      - "192.168.6.106:6004"
-      #- "192.168.6.106:6010"
+      labels:
+        zone_id: "215"
+        instance_name: "performance-test"
+        server_type: "performance-test"
+  metric_relabel_configs:
+  - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
+    target_label: project_name
+    replacement: "ggd"
 
 - job_name: 'nats_exporter'
   static_configs:
     - targets: ['192.168.6.215:7777']
+      labels:
+        zone_id: "215"
+        instance_name: "nats_exporter"
+        server_type: "nats_exporter"
+  metric_relabel_configs:
+  - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
+    target_label: project_name
+    replacement: "ggd"
