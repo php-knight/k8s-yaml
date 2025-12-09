@@ -4,7 +4,9 @@ global:
   evaluation_interval: 1m
 
 scrape_configs:
-
+- job_name: 'prometheus'
+  static_configs:
+    - targets: ['prometheus:9090']
 
 - job_name: 'account-node'
   static_configs:
@@ -74,3 +76,50 @@ scrape_configs:
   - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
     target_label: project_name
     replacement: "ggd"
+
+
+# linux node 对应机器ip和端口
+- job_name: 'linux-node'
+  static_configs:
+    - targets: ['192.168.6.215:9100']
+      labels:
+        zone_id: "215"
+        instance_name: "linux-node"
+        server_type: "linux-node"
+  metric_relabel_configs:
+  - source_labels: ['__name__']  # 可以用任意存在的 label 或 none
+    target_label: project_name
+    replacement: "ggd"
+
+
+# - job_name: "mongodb-exporter"
+#   static_configs:
+#     - targets:
+#       - mongodb://10.165.0.101:27017
+#       - mongodb://10.165.0.102:27017
+#       - mongodb://10.165.0.103:27017
+#       - mongodb://10.165.0.101:50000
+#       - mongodb://10.165.0.102:50000
+#       - mongodb://10.165.0.103:50000
+#       - mongodb://10.165.0.104:27017
+#       - mongodb://10.165.0.105:27017
+#       - mongodb://10.165.0.106:27017
+#       - mongodb://10.165.0.107:27017
+#       - mongodb://10.165.0.108:27017
+#       - mongodb://10.165.0.109:27017
+#       - mongodb://10.165.0.110:27017
+#       - mongodb://10.165.0.111:27017
+#       - mongodb://10.165.0.112:27017
+#       labels:
+#         region: cn-shanghai-2
+#         cluster: ggd-dev-mongodb
+#   metrics_path: /scrape
+#   relabel_configs:
+#     - source_labels: [__address__]
+#       target_label: __param_target
+#     - source_labels: [__param_target]
+#       target_label: instance
+#     - target_label: __address__
+#       replacement: "127.0.0.1:9216"
+
+

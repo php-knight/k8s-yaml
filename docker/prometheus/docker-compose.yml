@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   prometheus:
-    image: prom/prometheus:v2.52.0
+    image: prom/prometheus:latest
     container_name: prometheus
     user: "0"   # 等价于 K8S spec.securityContext.runAsUser: 0
     command:
@@ -16,6 +16,26 @@ services:
       # PV/PVC 映射
       - ./data/prometheus:/prometheus
     restart: unless-stopped
+    networks:
+      - prom_wk
+
+  #对应机器上部署 监听linux
+  # node_exporter: 
+  #   image: prom/node-exporter:latest
+  #   container_name: node_exporter
+  #   pid: "host"
+  #   ports:
+  #     - "30091:9100"   # 对应 NodePort 30090
+  #   command:
+  #     - '--path.rootfs=/host'
+  #   volumes:
+  #     - '/:/host:ro,rslave'
+  #   networks:
+  #     - prom_wk
+
+networks:
+  prom_wk:
+    driver: bridge
 
 volumes:
   prometheus-data:

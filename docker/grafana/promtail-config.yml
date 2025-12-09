@@ -14,20 +14,20 @@ clients:
       min_period: 500ms
 
 scrape_configs:
-  - job_name: "ggd"
+  - job_name: "ggd8001"
     static_configs:
       - targets:
           - localhost
         labels:
-          job: ggd
-          __path__: /var/log/*/logs/*.log
+          job: ggd8001
+          __path__: /var/log/8001/*/logs/*.log
 
     pipeline_stages:
       # 合并多行日志（以日期开头的新行视为新日志）
       - multiline:
           firstline: '^\d{4}-\d{2}-\d{2}'
       - match:
-          selector: '{job="ggd"}'
+          selector: '{job="ggd8001"}'
           stages:
             # 提取日志时间
             - regex:
@@ -37,7 +37,7 @@ scrape_configs:
                 format: RFC3339Nano   # 支持 ISO8601 带时区
             - regex:
                 source: filename
-                expression: "/var/log/(?P<instance_name>[^/]+)/logs/.*.log*"
+                expression: "/var/log/8001/(?P<instance_name>[^/]+)/logs/.*.log*"
             - labels:
                 instance_name:
             # 提取日志等级 [error/warn/info]
@@ -46,13 +46,131 @@ scrape_configs:
             - labels:
                 level:
 
-            # # 提取 key=value 标签
-            # - regex:
-            #     expression: "Uid=(?P<Uid>\\d+) ConnId=(?P<ConnId>\\d+) ErrCode=(?P<ErrCode>\\d+) ErrString=(?P<ErrString>[^ ]+) ErrCaller=(?P<ErrCaller>\\[[^\\]]+\\]) caller=(?P<caller>[^ ]+)"
-            # - labels:
-            #     Uid:
-            #     ConnId:
-            #     ErrCode:
-            #     ErrString:
-            #     ErrCaller:
-            #     caller:
+  - job_name: "ggd8002"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ggd8002
+          __path__: /var/log/8002/*/logs/*.log
+
+    pipeline_stages:
+      # 合并多行日志（以日期开头的新行视为新日志）
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}'
+      - match:
+          selector: '{job="ggd8002"}'
+          stages:
+            # 提取日志时间
+            - regex:
+                expression: '^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2})'
+            - timestamp:
+                source: ts
+                format: RFC3339Nano   # 支持 ISO8601 带时区
+            - regex:
+                source: filename
+                expression: "/var/log/8002/(?P<instance_name>[^/]+)/logs/.*.log*"
+            - labels:
+                instance_name:
+            # 提取日志等级 [error/warn/info]
+            - regex:
+                expression: "\\[ ?(?P<level>[a-zA-Z]+) ?\\]"
+            - labels:
+                level:
+
+  - job_name: "ggd8003"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ggd8003
+          __path__: /var/log/8003/*/logs/*.log
+
+    pipeline_stages:
+      # 合并多行日志（以日期开头的新行视为新日志）
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}'
+      - match:
+          selector: '{job="ggd8003"}'
+          stages:
+            # 提取日志时间
+            - regex:
+                expression: '^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2})'
+            - timestamp:
+                source: ts
+                format: RFC3339Nano   # 支持 ISO8601 带时区
+            - regex:
+                source: filename
+                expression: "/var/log/8003/(?P<instance_name>[^/]+)/logs/.*.log*"
+            - labels:
+                instance_name:
+            # 提取日志等级 [error/warn/info]
+            - regex:
+                expression: "\\[ ?(?P<level>[a-zA-Z]+) ?\\]"
+            - labels:
+                level:
+
+  - job_name: "ggd8004"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ggd8004
+          __path__: /var/log/8004/*/logs/*.log
+
+    pipeline_stages:
+      # 合并多行日志（以日期开头的新行视为新日志）
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}'
+      - match:
+          selector: '{job="ggd8004"}'
+          stages:
+            # 提取日志时间
+            - regex:
+                expression: '^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2})'
+            - timestamp:
+                source: ts
+                format: RFC3339Nano   # 支持 ISO8601 带时区
+            - regex:
+                source: filename
+                expression: "/var/log/8004/(?P<instance_name>[^/]+)/logs/.*.log*"
+            - labels:
+                instance_name:
+            # 提取日志等级 [error/warn/info]
+            - regex:
+                expression: "\\[ ?(?P<level>[a-zA-Z]+) ?\\]"
+            - labels:
+                level:
+
+  - job_name: "ggd8005"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: ggd8005
+          __path__: /var/log/8005/*/logs/*.log
+
+    pipeline_stages:
+      # 合并多行日志（以日期开头的新行视为新日志）
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}'
+      - match:
+          selector: '{job="ggd8005"}'
+          stages:
+            # 提取日志时间
+            - regex:
+                expression: '^(?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2})'
+            - timestamp:
+                source: ts
+                format: RFC3339Nano   # 支持 ISO8601 带时区
+            - regex:
+                source: filename
+                expression: "/var/log/8005/(?P<instance_name>[^/]+)/logs/.*.log*"
+            - labels:
+                instance_name:
+            # 提取日志等级 [error/warn/info]
+            - regex:
+                expression: "\\[ ?(?P<level>[a-zA-Z]+) ?\\]"
+            - labels:
+                level:
+
